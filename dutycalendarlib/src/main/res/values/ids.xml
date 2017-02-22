@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ibtn_pre" type="id" />
+    <item name="ibtn_next" type="id" />
+    <item name="tv_title" type="id" />
+    <item name="viewPager" type="id" />
+    <item name="item_day" type="id" />
+
+</resources>

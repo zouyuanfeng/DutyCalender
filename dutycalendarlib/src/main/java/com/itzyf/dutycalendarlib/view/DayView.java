@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Typeface;
 import android.support.annotation.ColorInt;
 import android.util.AttributeSet;
 import android.view.View;
@@ -63,10 +62,10 @@ public class DayView extends View {
 
         mPaint.setStyle(Paint.Style.FILL);
 
-        mPaint.setTextSize(DensityUtils.sp2px(context, 16));
+
         mPaint.setAntiAlias(true);
-        Typeface font = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-        mPaint.setTypeface(font);
+//        Typeface font = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
+//        mPaint.setTypeface(font);
     }
 
     @Override
@@ -75,7 +74,7 @@ public class DayView extends View {
             mPaint.setColor(getDutyColor());
             canvas.drawCircle(centerPoint, centerPoint, centerPoint, mPaint);
         }
-
+        mPaint.setTextSize(DensityUtils.sp2px(context, 21));
         mPaint.setColor(Color.BLACK);
         if (isDuty) {  //有班
             if (isCurrent) {
@@ -159,6 +158,7 @@ public class DayView extends View {
      */
     private void drawDuty(Canvas canvas, @ColorInt int color) {
         mPaint.setColor(color);
+        mPaint.setTextSize(DensityUtils.sp2px(context, 12));
         //绘制班字
         float textWidth2 = mPaint.measureText(duty);
         float x2 = width / 2 - textWidth2 / 2;

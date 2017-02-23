@@ -5,5 +5,7 @@
     <item name="tv_title" type="id" />
     <item name="viewPager" type="id" />
     <item name="item_day" type="id" />
+    <item name="item_root" type="id" />
+    <item name="item_duty" type="id" />
 
 </resources>

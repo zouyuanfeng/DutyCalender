@@ -1,14 +1,14 @@
 package com.itzyf.dutycalendarlib.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.itzyf.dutycalendarlib.R;
 import com.itzyf.dutycalendarlib.utils.DateUtil;
+import com.itzyf.dutycalendarlib.utils.DensityUtils;
+import com.itzyf.dutycalendarlib.view.DayView;
 
 /**
  * @author 依风听雨
@@ -22,6 +22,9 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
     private int preSumDays; //上一个月的总天数
     private int currentSumDays; //当前月的总天数
     private int nextSumDays; //下一个月的总天数
+    private int preFirstDayOfWeek;
+    private int currentFirstDayOfWeek;
+    private int nextFirstDayOfWeek;
 
     public MonthAdapter(Context context, int position) {
         this.context = context;
@@ -29,34 +32,43 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
         preSumDays = DateUtil.getPreMonthDays();
         currentSumDays = DateUtil.getCurrentMonthDays();
         nextSumDays = DateUtil.getNextMonthDays();
+        preFirstDayOfWeek = DateUtil.getPreFirstDayOfWeek();
+        currentFirstDayOfWeek = DateUtil.getFirstDayOfWeek();
+        nextFirstDayOfWeek = DateUtil.getNextFirstDayOfWeek();
     }
 
     @Override
     public DayViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new DayViewHolder(LayoutInflater.from(context).inflate(R.layout.item_day, null));
+        DayView view = new DayView(context);
+        view.setLayoutParams(new GridLayoutManager.LayoutParams(DensityUtils.dp2px(context, 48), DensityUtils.dp2px(context, 48)));
+        return new DayViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(DayViewHolder holder, int position) {
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(Calendar.DAY_OF_MONTH, 1);
-//        int week = calendar.get(Calendar.DAY_OF_WEEK);
-//        switch (this.position) {
-//            case 0:
-//                if (week >= position && position - week <= preSumDays)
-//                    holder.mView.setText(position - week + 1 + "\n班");
-//                else holder.mView.setText("");
-//                break;
-//            case 1:
-//                if (week >= position && position - week <= currentSumDays)
-//                    holder.mView.setText(position - week + 1 + "\n班");
-//                break;
-//            case 2:
-//                if (week >= position && position - week <= nextSumDays)
-//                    holder.mView.setText(position - week + 1 + "\n班");
-//                break;
-//        }
+        switch (this.position) {
+            case 0:
+                setText(holder, position, preFirstDayOfWeek, preSumDays);
+                break;
+            case 1:
+                setText(holder, position, currentFirstDayOfWeek, currentSumDays);
+                if (DateUtil.getCurrentMonthDay() == position - currentFirstDayOfWeek) {
+                    holder.dayView.setCurrent(true);
+                }
+                break;
+            case 2:
+                setText(holder, position, nextFirstDayOfWeek, nextSumDays);
+                break;
+        }
 
+    }
+
+    private void setText(DayViewHolder holder, int position, int firstDayOfWeek, int sumDays) {
+        if (firstDayOfWeek <= position && position - firstDayOfWeek < sumDays) {
+            holder.dayView.setDay(position - firstDayOfWeek + 1);
+            if (position % 7 > 0 && position % 7 < 6)
+                holder.dayView.setDuty(true);
+        }
     }
 
 
@@ -66,11 +78,13 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
     }
 
     class DayViewHolder extends RecyclerView.ViewHolder {
-        TextView mView;
+        DayView dayView;
 
         public DayViewHolder(View itemView) {
             super(itemView);
-            mView = (TextView) itemView.findViewById(R.id.item_day);
+            dayView = (DayView) itemView;
         }
+
+
     }
 }

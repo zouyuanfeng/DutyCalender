@@ -1,11 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="36dp"
-    android:layout_height="36dp"
-    android:id="@id/item_day"
-    android:background="@drawable/ic_brightness_24dp"
-    android:gravity="center"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/item_root"
+    android:layout_width="48dp"
+    android:layout_height="48dp"
     android:orientation="vertical"
-    android:text="31\n班"
-    android:textColor="#fff"
-    android:textSize="12sp" />
+    android:background="@drawable/ic_brightness_24dp">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="8dp" />
+
+    <TextView
+        android:id="@id/item_day"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:textColor="#fff"
+        android:textSize="12sp"
+        tools:text="31" />
+
+    <TextView
+        android:id="@id/item_duty"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:textColor="#fff"
+        android:textSize="12sp"
+        tools:text="班" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="8dp" />
+</LinearLayout>

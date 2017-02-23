@@ -55,22 +55,52 @@ public class DateUtil {
     }
 
 
+    /**
+     * 获取第一天是周几
+     *
+     * @return
+     */
+    public static int getPreFirstDayOfWeek() {
+        return getFirstDayOfWeek(-1);
+    }
+
+    public static int getFirstDayOfWeek() {
+        return getFirstDayOfWeek(0);
+    }
+
+    public static int getNextFirstDayOfWeek() {
+        return getFirstDayOfWeek(1);
+    }
+
+    /**
+     * 周日：1---周六：7
+     *
+     * @param offset
+     * @return
+     */
+    private static int getFirstDayOfWeek(int offset) {
+        Calendar c = Calendar.getInstance();
+        c.add(Calendar.MONTH, offset);
+        c.set(Calendar.DAY_OF_MONTH, 1);
+        return c.get(Calendar.DAY_OF_WEEK)-1;
+    }
+
     public static int getPreMonthDays() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.MONTH, -1);
-        return getMonthDays(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+        return getMonthDays(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1);
     }
 
     public static int getCurrentMonthDays() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.MONTH, 0);
-        return getMonthDays(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+        return getMonthDays(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1);
     }
 
     public static int getNextMonthDays() {
         Calendar c = Calendar.getInstance();
         c.add(Calendar.MONTH, 1);
-        return getMonthDays(c.get(Calendar.YEAR), c.get(Calendar.MONTH));
+        return getMonthDays(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1);
     }
 
 }  

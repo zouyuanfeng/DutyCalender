@@ -1,12 +1,20 @@
 package com.itzyf.dutycalendarlib.view;
 
 import android.content.Context;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,6 +43,10 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
     private List<View> viewList;
     private ImageButton mBtnPre, mBtnNext;
 
+    private LinearLayout mLlWeek;
+
+    private String[] weeks = getResources().getStringArray(R.array.weeks);
+
 
     public DutyCalendar(Context context) {
         this(context, null);
@@ -55,6 +67,11 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         mViewPager.setCurrentItem(1);
         mViewPager.addOnPageChangeListener(listener);
         setTitle(1);
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DutyCalendar);
+        int color = a.getColor(R.styleable.DutyCalendar_arrowColor, 0xFF000000);
+        setArrow(color);
+        a.recycle();
     }
 
     private void initView() {
@@ -64,6 +81,21 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         mBtnPre.setOnClickListener(this);
         mBtnNext = (ImageButton) findViewById(R.id.ibtn_next);
         mBtnNext.setOnClickListener(this);
+        mLlWeek = (LinearLayout) findViewById(R.id.ll_week);
+        createWeekView();
+    }
+
+    private void createWeekView() {
+        for (String week : weeks) {
+            TextView tv = new TextView(context);
+            LayoutParams lp = new LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT);
+            lp.weight = 1;
+            tv.setLayoutParams(lp);
+            tv.setGravity(Gravity.CENTER);
+            tv.setTextColor(0xDD000000);
+            tv.setText(week);
+            mLlWeek.addView(tv);
+        }
     }
 
     private void addViewList() {
@@ -145,5 +177,24 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
                 break;
         }
         mTvTitle.setText(sdf.format(calendar.getTime()));
+    }
+
+    /**
+     * 设置箭头的颜色
+     *
+     * @param color
+     */
+    public void setArrow(@ColorInt int color) {
+        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_keyboard_arrow_right_24dp);
+        DrawableCompat.setTint(drawable, color);
+        mBtnNext.setImageDrawable(drawable);
+
+        Drawable drawable2 = ContextCompat.getDrawable(context, R.drawable.ic_keyboard_arrow_left_24dp);
+        DrawableCompat.setTint(drawable2, color);
+        mBtnPre.setImageDrawable(drawable2);
+    }
+
+    public void setArrowRes(@ColorRes int color) {
+        setArrow(getResources().getColor(color));
     }
 }

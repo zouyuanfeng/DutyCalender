@@ -9,6 +9,17 @@
 | titleAnim        |   true   |   标题是否显示动画   |
 | titleAnimDuration        |    150    |  标题动画的时长  |
 
+#### 方法
+|setPreListDuty() | 设置上个月的值班日期 |
+| --------   | -----:  | :----:  |
+|setCurrentListDuty() | 设置当前月的值班日期 |
+|setNextListDuty() | 设置下个月的值班日期 |
+|setArrow()|设置箭头颜色|
+|setWeeksTextSize()|设置周几的文字大小|
+|setWeeksColor()|设置周几的文字颜色|
+|setTitleAnim()|标题是否显示动画|
+|setTitleAnimDuration()|标题动画的时长|
+
 #### 2017-2-24
 * 修复日期显示多一天的问题
 * 适配5.0以下的箭头颜色修改

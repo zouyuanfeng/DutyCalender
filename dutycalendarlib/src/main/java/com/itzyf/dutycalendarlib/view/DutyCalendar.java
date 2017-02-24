@@ -58,10 +58,11 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
     private boolean isTitleAnim = true;
     private int translate;
     public static final int DEFAULT_Y_TRANSLATION_DP = 20;
+
     /**
      * 动画时间
      */
-    private int titleAnimTime = 150;
+    private int titleAnimDuration = 150;
 
     private float weeksTextSize;
 
@@ -97,7 +98,7 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         setArrow(color);
         weeksColor = a.getColor(R.styleable.DutyCalendar_weeksColor, 0xDD000000);
         isTitleAnim = a.getBoolean(R.styleable.DutyCalendar_titleAnim, true);
-        titleAnimTime = a.getInteger(R.styleable.DutyCalendar_titleAnimDuration, 150);
+        titleAnimDuration = a.getInteger(R.styleable.DutyCalendar_titleAnimDuration, 150);
         weeksTextSize = a.getDimension(R.styleable.DutyCalendar_weeksTextSize, DensityUtils.sp2px(context, 16));
         a.recycle();
 
@@ -320,7 +321,7 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         viewPropertyAnimator.translationY(translation * -1);
         viewPropertyAnimator
                 .alpha(0)
-                .setDuration(titleAnimTime)
+                .setDuration(titleAnimDuration)
                 .setInterpolator(interpolator)
                 .setListener(new AnimatorListener() {
 
@@ -339,12 +340,30 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
                         viewPropertyAnimator.translationY(0);
                         viewPropertyAnimator
                                 .alpha(1)
-                                .setDuration(titleAnimTime)
+                                .setDuration(titleAnimDuration)
                                 .setInterpolator(interpolator)
                                 .setListener(new AnimatorListener())
                                 .start();
                     }
                 }).start();
+    }
+
+    /**
+     * 设置动画时长
+     *
+     * @param titleAnimDuration
+     */
+    public void setTitleAnimDuration(int titleAnimDuration) {
+        this.titleAnimDuration = titleAnimDuration;
+    }
+
+    /**
+     * 设置是否显示动画
+     *
+     * @param titleAnim
+     */
+    public void setTitleAnim(boolean titleAnim) {
+        isTitleAnim = titleAnim;
     }
 
 }

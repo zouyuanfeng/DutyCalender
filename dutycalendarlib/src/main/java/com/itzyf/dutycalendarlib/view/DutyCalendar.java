@@ -1,20 +1,23 @@
 package com.itzyf.dutycalendarlib.view;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
+import android.graphics.PorterDuff;
 import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,10 +25,15 @@ import android.widget.TextView;
 import com.itzyf.dutycalendarlib.R;
 import com.itzyf.dutycalendarlib.adapter.CalendarAdapter;
 import com.itzyf.dutycalendarlib.adapter.MonthAdapter;
+import com.itzyf.dutycalendarlib.utils.AnimatorListener;
+import com.itzyf.dutycalendarlib.utils.DensityUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,8 +53,19 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
 
     private LinearLayout mLlWeek;
 
-    private String[] weeks = getResources().getStringArray(R.array.weeks);
+    private int weeksColor = 0xDD000000;
 
+    private boolean isTitleAnim = true;
+    private int translate;
+    public static final int DEFAULT_Y_TRANSLATION_DP = 20;
+    /**
+     * 动画时间
+     */
+    private int titleAnimTime = 150;
+
+    private float weeksTextSize;
+
+    private String[] weeks = getResources().getStringArray(R.array.weeks);
 
     public DutyCalendar(Context context) {
         this(context, null);
@@ -59,6 +78,7 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
     public DutyCalendar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
+        //初始化view
         LayoutInflater.from(context).inflate(R.layout.duty_calendar, this);
         initView();
         addViewList();
@@ -66,12 +86,43 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         mViewPager.setAdapter(mAdapter);
         mViewPager.setCurrentItem(1);
         mViewPager.addOnPageChangeListener(listener);
-        setTitle(1);
+        mTvTitle.setText(sdf.format(Calendar.getInstance().getTime()));
 
+        translate = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, DEFAULT_Y_TRANSLATION_DP, getResources().getDisplayMetrics());
+
+        //初始化属性
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DutyCalendar);
-        int color = a.getColor(R.styleable.DutyCalendar_arrowColor, 0xFF000000);
+        int color = a.getColor(R.styleable.DutyCalendar_arrowColor, 0xDD000000);
         setArrow(color);
+        weeksColor = a.getColor(R.styleable.DutyCalendar_weeksColor, 0xDD000000);
+        isTitleAnim = a.getBoolean(R.styleable.DutyCalendar_titleAnim, true);
+        titleAnimTime = a.getInteger(R.styleable.DutyCalendar_titleAnimDuration, 150);
+        weeksTextSize = a.getDimension(R.styleable.DutyCalendar_weeksTextSize, DensityUtils.sp2px(context, 16));
         a.recycle();
+
+        createWeekView();
+    }
+
+    public void setWeeksColor(@ColorInt int weeksColor) {
+        for (int i = 0; i < mLlWeek.getChildCount(); i++) {
+            if (mLlWeek.getChildAt(i) instanceof TextView) {
+                ((TextView) mLlWeek.getChildAt(i)).setTextColor(weeksColor);
+            }
+        }
+    }
+
+    /**
+     * 单位为sp或dp
+     *
+     * @param textSize
+     */
+    public void setWeeksTextSize(float textSize) {
+        for (int i = 0; i < mLlWeek.getChildCount(); i++) {
+            if (mLlWeek.getChildAt(i) instanceof TextView) {
+                ((TextView) mLlWeek.getChildAt(i)).setTextSize(textSize);
+            }
+        }
     }
 
     private void initView() {
@@ -82,7 +133,7 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         mBtnNext = (ImageButton) findViewById(R.id.ibtn_next);
         mBtnNext.setOnClickListener(this);
         mLlWeek = (LinearLayout) findViewById(R.id.ll_week);
-        createWeekView();
+
     }
 
     private void createWeekView() {
@@ -92,10 +143,15 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
             lp.weight = 1;
             tv.setLayoutParams(lp);
             tv.setGravity(Gravity.CENTER);
-            tv.setTextColor(0xDD000000);
+            tv.setTextColor(weeksColor);
+            tv.setTextSize(getWeeksTextSize());
             tv.setText(week);
             mLlWeek.addView(tv);
         }
+    }
+
+    private float getWeeksTextSize() {
+        return DensityUtils.px2sp(context, weeksTextSize);
     }
 
     private void addViewList() {
@@ -164,7 +220,7 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         mViewPager.setCurrentItem(position);
     }
 
-    public void setTitle(int position) {
+    private void setTitle(int position) {
         Calendar calendar = Calendar.getInstance();
         switch (position) {
             case 0:
@@ -176,7 +232,8 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
             default:
                 break;
         }
-        mTvTitle.setText(sdf.format(calendar.getTime()));
+        doChange(calendar.getTime());
+//        mTvTitle.setText();
     }
 
     /**
@@ -185,16 +242,109 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
      * @param color
      */
     public void setArrow(@ColorInt int color) {
-        Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_keyboard_arrow_right_24dp);
-        DrawableCompat.setTint(drawable, color);
-        mBtnNext.setImageDrawable(drawable);
-
-        Drawable drawable2 = ContextCompat.getDrawable(context, R.drawable.ic_keyboard_arrow_left_24dp);
-        DrawableCompat.setTint(drawable2, color);
-        mBtnPre.setImageDrawable(drawable2);
+        mBtnNext.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+        mBtnPre.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
     }
 
     public void setArrowRes(@ColorRes int color) {
         setArrow(getResources().getColor(color));
     }
+
+    /**
+     * 上个月有班的数组
+     *
+     * @param duty
+     */
+    public void setPreListDuty(List<Integer> duty) {
+        setDutts(duty, 0);
+    }
+
+    public void setPreListDuty(Integer... duty) {
+        setDutts(Arrays.asList(duty), 0);
+    }
+
+    /**
+     * 当月有班的数组
+     *
+     * @param duty
+     */
+    public void setCurrentListDuty(List<Integer> duty) {
+        setDutts(duty, 1);
+    }
+
+    public void setCurrentListDuty(Integer... duty) {
+        setDutts(Arrays.asList(duty), 1);
+    }
+
+    /**
+     * 下个月有班的数组
+     *
+     * @param duty
+     */
+    public void setNextListDuty(List<Integer> duty) {
+        setDutts(duty, 2);
+    }
+
+    public void setNextListDuty(Integer... duty) {
+        setDutts(Arrays.asList(duty), 2);
+    }
+
+    private void setDutts(List<Integer> duty, int position) {
+        ((MonthAdapter) ((RecyclerView) viewList.get(position)).getAdapter()).setDutys(duty);
+    }
+
+    private final Interpolator interpolator = new DecelerateInterpolator(2f);
+
+    private void doChange(Date currentDate) {
+        mTvTitle.animate().cancel();
+        mTvTitle.setTranslationY(0);
+
+        mTvTitle.setAlpha(1);
+
+        final CharSequence newTitle = sdf.format(currentDate);
+
+        if (!isTitleAnim) {
+            mTvTitle.setText(newTitle);
+            return;
+        }
+        int translation1 = translate;
+        try {
+            Date previousDate = sdf.parse(mTvTitle.getText().toString());
+            translation1 = translate * (previousDate.before(currentDate) ? 1 : -1);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        final int translation = translation1;
+
+        final ViewPropertyAnimator viewPropertyAnimator = mTvTitle.animate();
+        viewPropertyAnimator.translationY(translation * -1);
+        viewPropertyAnimator
+                .alpha(0)
+                .setDuration(titleAnimTime)
+                .setInterpolator(interpolator)
+                .setListener(new AnimatorListener() {
+
+                    @Override
+                    public void onAnimationCancel(Animator animator) {
+                        mTvTitle.setTranslationY(0);
+                        mTvTitle.setAlpha(1);
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animator) {
+                        mTvTitle.setText(newTitle);
+                        mTvTitle.setTranslationY(translation);
+
+                        final ViewPropertyAnimator viewPropertyAnimator = mTvTitle.animate();
+                        viewPropertyAnimator.translationY(0);
+                        viewPropertyAnimator
+                                .alpha(1)
+                                .setDuration(titleAnimTime)
+                                .setInterpolator(interpolator)
+                                .setListener(new AnimatorListener())
+                                .start();
+                    }
+                }).start();
+    }
+
 }

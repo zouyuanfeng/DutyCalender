@@ -2,5 +2,9 @@
 <resources>
     <declare-styleable name="DutyCalendar">
         <attr name="arrowColor" format="color|reference" />
+        <attr name="weeksColor" format="color|reference" />
+        <attr name="titleAnim" format="boolean" />
+        <attr name="titleAnimDuration" format="integer" />
+        <attr name="weeksTextSize" format="dimension" />
     </declare-styleable>
 </resources>

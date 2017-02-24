@@ -73,7 +73,7 @@ public class DateUtil {
     }
 
     /**
-     * 周日：1---周六：7
+     * 周日：0---周六：6
      *
      * @param offset
      * @return

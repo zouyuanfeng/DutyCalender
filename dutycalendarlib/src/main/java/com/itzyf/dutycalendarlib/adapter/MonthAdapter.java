@@ -10,6 +10,8 @@ import com.itzyf.dutycalendarlib.utils.DateUtil;
 import com.itzyf.dutycalendarlib.utils.DensityUtils;
 import com.itzyf.dutycalendarlib.view.DayView;
 
+import java.util.List;
+
 /**
  * @author 依风听雨
  * @version 2017/2/22.
@@ -25,16 +27,23 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
     private int preFirstDayOfWeek;
     private int currentFirstDayOfWeek;
     private int nextFirstDayOfWeek;
+    private List<Integer> mDutys;
 
     public MonthAdapter(Context context, int position) {
         this.context = context;
         this.position = position;
+
         preSumDays = DateUtil.getPreMonthDays();
         currentSumDays = DateUtil.getCurrentMonthDays();
         nextSumDays = DateUtil.getNextMonthDays();
         preFirstDayOfWeek = DateUtil.getPreFirstDayOfWeek();
         currentFirstDayOfWeek = DateUtil.getFirstDayOfWeek();
         nextFirstDayOfWeek = DateUtil.getNextFirstDayOfWeek();
+    }
+
+    public void setDutys(List<Integer> mDutys) {
+        this.mDutys = mDutys;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -52,7 +61,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
                 break;
             case 1:
                 setText(holder, position, currentFirstDayOfWeek, currentSumDays);
-                if (DateUtil.getCurrentMonthDay() == position - currentFirstDayOfWeek) {
+                if (DateUtil.getCurrentMonthDay() == position - currentFirstDayOfWeek + 1) {
                     holder.dayView.setCurrent(true);
                 }
                 break;
@@ -65,8 +74,9 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
 
     private void setText(DayViewHolder holder, int position, int firstDayOfWeek, int sumDays) {
         if (firstDayOfWeek <= position && position - firstDayOfWeek < sumDays) {
-            holder.dayView.setDay(position - firstDayOfWeek + 1);
-            if (position % 7 > 0 && position % 7 < 6)
+            int day = position - firstDayOfWeek + 1;
+            holder.dayView.setDay(day);
+            if (mDutys != null && mDutys.contains(day))
                 holder.dayView.setDuty(true);
         }
     }

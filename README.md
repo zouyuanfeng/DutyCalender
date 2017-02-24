@@ -10,8 +10,9 @@
 | titleAnimDuration        |    150    |  标题动画的时长  |
 
 #### 方法
+| 方法名        | 用途   | 
+| --------   | : -----:  | :----:  |
 |setPreListDuty() | 设置上个月的值班日期 |
-| --------   | -----:  | :----:  |
 |setCurrentListDuty() | 设置当前月的值班日期 |
 |setNextListDuty() | 设置下个月的值班日期 |
 |setArrow()|设置箭头颜色|

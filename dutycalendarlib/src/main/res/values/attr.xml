@@ -6,5 +6,8 @@
         <attr name="titleAnim" format="boolean" />
         <attr name="titleAnimDuration" format="integer" />
         <attr name="weeksTextSize" format="dimension" />
+        <attr name="titleColor" format="color|reference" />
+        <attr name="titleTextSize" format="dimension" />
+        <attr name="dayWidth" format="dimension" />
     </declare-styleable>
 </resources>

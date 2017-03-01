@@ -10,9 +10,10 @@
     <com.itzyf.dutycalendarlib.view.DutyCalendar
         android:id="@+id/duty"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="340dp"
         app:arrowColor="#d0000000"
         app:titleAnimDuration="200"
+        app:dayWidth="36dp"
         app:weeksColor="#d0000000"
-        app:weeksTextSize="16sp" />
+        app:weeksTextSize="14sp" />
 </RelativeLayout>

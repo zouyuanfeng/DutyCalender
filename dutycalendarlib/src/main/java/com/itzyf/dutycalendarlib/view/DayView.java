@@ -46,6 +46,10 @@ public class DayView extends View {
     private String day = "";
     private static final String duty = "班";
 
+    private int dutyTextSize;
+    private int dayTextSize;
+    private final static int dayTextColor = Color.BLACK;
+
     public DayView(Context context) {
         this(context, null);
     }
@@ -57,15 +61,9 @@ public class DayView extends View {
     public DayView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-
         mPaint = new Paint();
-
         mPaint.setStyle(Paint.Style.FILL);
-
-
         mPaint.setAntiAlias(true);
-//        Typeface font = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
-//        mPaint.setTypeface(font);
     }
 
     @Override
@@ -74,21 +72,21 @@ public class DayView extends View {
             mPaint.setColor(getDutyColor());
             canvas.drawCircle(centerPoint, centerPoint, centerPoint, mPaint);
         }
-        mPaint.setTextSize(DensityUtils.sp2px(context, 21));
-        mPaint.setColor(Color.BLACK);
+        mPaint.setTextSize(dayTextSize);
+        mPaint.setColor(dayTextColor);
         if (isDuty) {  //有班
             if (isCurrent) {
                 drawDay(canvas, WHITE);
                 drawDuty(canvas, WHITE);
             } else {
                 drawDay(canvas, getDutyColor());
-                drawDuty(canvas, Color.BLACK);
+                drawDuty(canvas, dayTextColor);
             }
         } else {
             if (isCurrent) {
                 mPaint.setColor(Color.WHITE);
             } else {
-                mPaint.setColor(Color.BLACK);
+                mPaint.setColor(dayTextColor);
             }
             float textWidth = mPaint.measureText(day);
             float x = width / 2 - textWidth / 2;
@@ -110,6 +108,14 @@ public class DayView extends View {
             width = height = DensityUtils.dp2px(context, dpWidthOrHeight);
         }
         centerPoint = width / 2;
+
+        if (DensityUtils.px2dp(context, 42) < width) {
+            dutyTextSize = DensityUtils.sp2px(context, 10);
+            dayTextSize = DensityUtils.sp2px(context, 18);
+        } else {
+            dutyTextSize = DensityUtils.sp2px(context, 12);
+            dayTextSize = DensityUtils.sp2px(context, 21);
+        }
     }
 
     public void setDuty(boolean duty) {
@@ -158,7 +164,7 @@ public class DayView extends View {
      */
     private void drawDuty(Canvas canvas, @ColorInt int color) {
         mPaint.setColor(color);
-        mPaint.setTextSize(DensityUtils.sp2px(context, 12));
+        mPaint.setTextSize(dutyTextSize);
         //绘制班字
         float textWidth2 = mPaint.measureText(duty);
         float x2 = width / 2 - textWidth2 / 2;

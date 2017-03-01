@@ -59,6 +59,8 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
     private int translate;
     public static final int DEFAULT_Y_TRANSLATION_DP = 20;
 
+    public float dayWidth = 48;
+
     /**
      * 动画时间
      */
@@ -82,15 +84,6 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         //初始化view
         LayoutInflater.from(context).inflate(R.layout.duty_calendar, this);
         initView();
-        addViewList();
-        mAdapter = new CalendarAdapter(viewList);
-        mViewPager.setAdapter(mAdapter);
-        mViewPager.setCurrentItem(1);
-        mViewPager.addOnPageChangeListener(listener);
-        mTvTitle.setText(sdf.format(Calendar.getInstance().getTime()));
-
-        translate = (int) TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP, DEFAULT_Y_TRANSLATION_DP, getResources().getDisplayMetrics());
 
         //初始化属性
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DutyCalendar);
@@ -100,7 +93,20 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         isTitleAnim = a.getBoolean(R.styleable.DutyCalendar_titleAnim, true);
         titleAnimDuration = a.getInteger(R.styleable.DutyCalendar_titleAnimDuration, 150);
         weeksTextSize = a.getDimension(R.styleable.DutyCalendar_weeksTextSize, DensityUtils.sp2px(context, 16));
+        setTitleColor(a.getColor(R.styleable.DutyCalendar_titleColor, 0xFF000000));
+        setTitleSizeToPx(a.getDimension(R.styleable.DutyCalendar_titleTextSize, DensityUtils.sp2px(context, 16)));
+        dayWidth = a.getDimension(R.styleable.DutyCalendar_dayWidth, DensityUtils.dp2px(context, 48));
         a.recycle();
+
+        addViewList();
+        mAdapter = new CalendarAdapter(viewList);
+        mViewPager.setAdapter(mAdapter);
+        mViewPager.setCurrentItem(1);
+        mViewPager.addOnPageChangeListener(listener);
+        mTvTitle.setText(sdf.format(Calendar.getInstance().getTime()));
+
+        translate = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, DEFAULT_Y_TRANSLATION_DP, getResources().getDisplayMetrics());
 
         createWeekView();
     }
@@ -172,7 +178,7 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
                 return false;
             }
         });
-        rv.setAdapter(new MonthAdapter(context, position));
+        rv.setAdapter(new MonthAdapter(context, position, dayWidth));
         return rv;
     }
 
@@ -366,4 +372,20 @@ public class DutyCalendar extends LinearLayout implements View.OnClickListener {
         isTitleAnim = titleAnim;
     }
 
+
+    public void setTitleColor(@ColorInt int color) {
+        mTvTitle.setTextColor(color);
+    }
+
+    public void setTitleColorRes(@ColorRes int colorRes) {
+        mTvTitle.setTextColor(getResources().getColor(colorRes));
+    }
+
+    public void setTitleSizeToPx(float size) {
+        mTvTitle.setTextSize(DensityUtils.px2sp(context, size));
+    }
+
+    public void setTitleSize(float size) {
+        mTvTitle.setTextSize(size);
+    }
 }

@@ -28,17 +28,23 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
     private int currentFirstDayOfWeek;
     private int nextFirstDayOfWeek;
     private List<Integer> mDutys;
+    private float dayWidth;
 
     public MonthAdapter(Context context, int position) {
         this.context = context;
         this.position = position;
-
+        dayWidth = DensityUtils.dp2px(context, 48);
         preSumDays = DateUtil.getPreMonthDays();
         currentSumDays = DateUtil.getCurrentMonthDays();
         nextSumDays = DateUtil.getNextMonthDays();
         preFirstDayOfWeek = DateUtil.getPreFirstDayOfWeek();
         currentFirstDayOfWeek = DateUtil.getFirstDayOfWeek();
         nextFirstDayOfWeek = DateUtil.getNextFirstDayOfWeek();
+    }
+
+    public MonthAdapter(Context context, int position, float dayWidth) {
+        this(context, position);
+        this.dayWidth = dayWidth;
     }
 
     public void setDutys(List<Integer> mDutys) {
@@ -49,7 +55,7 @@ public class MonthAdapter extends RecyclerView.Adapter<MonthAdapter.DayViewHolde
     @Override
     public DayViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         DayView view = new DayView(context);
-        view.setLayoutParams(new GridLayoutManager.LayoutParams(DensityUtils.dp2px(context, 48), DensityUtils.dp2px(context, 48)));
+        view.setLayoutParams(new GridLayoutManager.LayoutParams((int) dayWidth, (int) dayWidth));
         return new DayViewHolder(view);
     }
 
